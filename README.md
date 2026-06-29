@@ -27,7 +27,7 @@ Work through the phases in order. Each one ends with a gate check before you mov
 | 4 | **Pick Your KPIs** | Choose 3–4 stats that directly answer "who gives the most wins per dollar?" |
 | 5 | **Find Your Top 3** | Apply the GM's filters, rank by Bang for Buck, and identify your best candidates |
 | 6 | **Build the Dashboard** | Create a 3-tab Power BI dashboard modeled on the reference mockup |
-| 7 | **Write Your Insights** | Draft a 1-page insights memo using AI as a first-pass helper, then edit it yourself |
+| 7 | **Write Your Insights** | Translate your findings into a concise executive write-up |
 | 8 | **Present to the Partners** | Deliver a 3-slide presentation with one clear recommendation |
 
 ---
@@ -60,7 +60,6 @@ By the end of the assignment you'll have:
 
 - A cleaned Excel dataset with every data issue documented in a Cleaning Log
 - A 3-tab Power BI dashboard the GM can actually use
-- A 1-page AI-assisted insights memo
 - A 3-slide presentation with one specific player recommendation
 
 ---

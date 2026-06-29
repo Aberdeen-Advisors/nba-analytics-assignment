@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NBA Analytics Challenge — Your Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Roboto+Condensed:wght@400;700&display=swap');
+  :root {
+    --navy:#1D428A; --navy-dark:#0A1628; --red:#C8102E;
+    --gold:#FFC72C; --white:#FFFFFF; --off:#F8F9FC;
+    --gray-light:#EEF1F7; --gray:#8A96A8; --text:#1A1F2E; --light-text:#4A5568;
+    --green:#1A7A3F; --green-light:#EBF7F0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;background:var(--off);color:var(--text);line-height:1.6;}
+
+  .hero{background:var(--navy-dark);background-image:repeating-linear-gradient(45deg,rgba(255,199,44,.03) 0,rgba(255,199,44,.03) 1px,transparent 1px,transparent 60px),repeating-linear-gradient(-45deg,rgba(200,16,46,.04) 0,rgba(200,16,46,.04) 1px,transparent 1px,transparent 60px);color:#fff;padding:56px 40px 44px;text-align:center;position:relative;overflow:hidden;}
+  .hero-ball{font-size:68px;display:block;margin-bottom:14px;filter:drop-shadow(0 4px 20px rgba(255,199,44,.4));position:relative;z-index:1;}
+  .hero h1{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;color:var(--gold);text-shadow:0 2px 20px rgba(255,199,44,.3);position:relative;z-index:1;}
+  .hero h2{font-family:'Roboto Condensed',sans-serif;font-size:18px;font-weight:400;color:rgba(255,255,255,.82);margin-top:10px;position:relative;z-index:1;}
+  .hero-meta{display:flex;justify-content:center;gap:28px;margin-top:28px;position:relative;z-index:1;flex-wrap:wrap;}
+  .hero-stat .val{font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--gold);display:block;}
+  .hero-stat .lbl{font-size:11px;color:rgba(255,255,255,.55);letter-spacing:1px;text-transform:uppercase;}
+  .hero-div{width:1px;height:44px;background:rgba(255,255,255,.18);align-self:center;}
+
+  .nav{background:var(--navy);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3);}
+  .nav-inner{display:flex;overflow-x:auto;scrollbar-width:none;}
+  .nav-inner::-webkit-scrollbar{display:none;}
+  .nav-btn{background:none;border:none;color:rgba(255,255,255,.68);padding:13px 18px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all .2s;}
+  .nav-btn:hover{color:var(--gold);background:rgba(255,255,255,.05);}
+  .nav-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+  .container{max-width:920px;margin:0 auto;padding:0 22px;}
+  .section{display:none;padding:44px 0;}
+  .section.active{display:block;}
+
+  .sec-hdr{display:flex;align-items:flex-start;gap:18px;margin-bottom:32px;padding-bottom:20px;border-bottom:3px solid var(--navy);}
+  .sec-icon{font-size:42px;line-height:1;flex-shrink:0;}
+  .sec-hdr h2{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--navy);letter-spacing:1px;line-height:1;}
+  .sec-hdr p{color:var(--light-text);font-size:15px;margin-top:6px;}
+
+  .card{background:#fff;border-radius:12px;padding:26px;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,0,0,.06);border-left:5px solid var(--navy);}
+  .card.red{border-left-color:var(--red);}
+  .card.gold{border-left-color:var(--gold);}
+  .card.green{border-left-color:var(--green);}
+  .card h3{font-family:'Roboto Condensed',sans-serif;font-size:17px;font-weight:700;color:var(--navy);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+  .card.red h3{color:var(--red);} .card.gold h3{color:#AA7700;} .card.green h3{color:var(--green);}
+  .card p,.card li{font-size:14px;color:var(--light-text);line-height:1.65;}
+  .card ul,.card ol{padding-left:20px;}
+  .card li{margin-bottom:6px;}
+
+  /* PHASE CARDS */
+  .phase-card{background:#fff;border-radius:10px;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,.06);overflow:hidden;}
+  .phase-header{display:flex;align-items:stretch;cursor:pointer;user-select:none;}
+  .phase-num{background:var(--navy);color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:30px;padding:0 18px;display:flex;align-items:center;min-width:56px;justify-content:center;}
+  .phase-title-area{flex:1;padding:16px 18px;background:var(--navy);}
+  .phase-title-area h3{font-family:'Bebas Neue',sans-serif;font-size:21px;color:#fff;letter-spacing:1px;margin:0;}
+  .phase-title-area p{font-size:13px;color:rgba(255,255,255,.65);margin:2px 0 0;}
+  .phase-toggle{background:rgba(255,255,255,.1);color:#fff;padding:0 18px;display:flex;align-items:center;font-size:17px;transition:transform .2s;}
+  .phase-body{padding:22px 26px;display:none;background:#fff;}
+  .phase-body.open{display:block;}
+  .phase-body h4{font-family:'Roboto Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);margin:14px 0 8px;padding-bottom:3px;border-bottom:2px solid var(--gray-light);}
+  .phase-body h4:first-child{margin-top:0;}
+  .phase-body ul,.phase-body ol{padding-left:18px;margin-bottom:10px;}
+  .phase-body li{font-size:14px;color:var(--light-text);margin-bottom:5px;line-height:1.5;}
+  .phase-body p{font-size:14px;color:var(--light-text);margin-bottom:10px;line-height:1.5;}
+  .deliver-badge{display:inline-block;background:var(--navy);color:#fff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:4px;margin:3px 3px 3px 0;}
+  .gate-badge{display:inline-block;background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;}
+
+  /* CALLOUTS */
+  .callout{border-radius:10px;padding:14px 18px;margin:14px 0;font-size:14px;display:flex;gap:12px;align-items:flex-start;}
+  .callout.tip{background:#EEF5FF;border-left:4px solid var(--navy);}
+  .callout.warn{background:#FFF8E8;border-left:4px solid var(--gold);}
+  .callout.rule{background:#FFF0F0;border-left:4px solid var(--red);}
+  .callout.good{background:var(--green-light);border-left:4px solid var(--green);}
+  .callout-icon{font-size:18px;flex-shrink:0;}
+  .callout p{color:var(--light-text);line-height:1.5;margin:0;font-size:14px;}
+  .callout strong{color:var(--text);}
+
+  /* KPI CARDS */
+  .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0;}
+  @media(max-width:580px){.kpi-grid{grid-template-columns:1fr;}}
+  .kpi-card{background:#fff;border-radius:10px;padding:18px;border:2px solid var(--gray-light);box-shadow:0 1px 6px rgba(0,0,0,.05);}
+  .kpi-card.star{border-color:var(--gold);}
+  .kpi-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--navy);margin-bottom:4px;}
+  .kpi-card.star .kpi-num{color:#AA7700;}
+  .kpi-name{font-weight:700;color:var(--text);font-size:15px;margin-bottom:6px;}
+  .kpi-def{font-size:13px;color:var(--light-text);line-height:1.5;}
+  .kpi-eg{font-size:12px;background:var(--gray-light);padding:4px 8px;border-radius:5px;margin-top:8px;font-family:monospace;}
+  .star-badge{background:var(--gold);color:var(--navy-dark);font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;letter-spacing:.5px;text-transform:uppercase;margin-left:6px;}
+
+  /* DIRTY DATA */
+  .issue-card{background:#fff;border:2px solid var(--red);border-radius:10px;padding:16px 18px;margin-bottom:12px;}
+  .issue-card h4{font-family:'Roboto Condensed',sans-serif;font-weight:700;color:var(--red);font-size:15px;text-transform:uppercase;margin-bottom:8px;}
+  .issue-card p{font-size:13px;color:var(--light-text);line-height:1.5;}
+  .fix-hint{margin-top:10px;padding:8px 10px;background:#FFF3F3;border-radius:6px;font-size:12px;color:#8B0000;font-style:italic;}
+  .what-good{margin-top:8px;padding:8px 10px;background:var(--green-light);border-radius:6px;font-size:12px;color:var(--green);}
+
+  /* DICT TABLE */
+  .dict-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:24px;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+  .dict-table th{background:var(--navy);color:var(--gold);padding:11px 13px;text-align:left;font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;}
+  .dict-table td{padding:9px 13px;border-bottom:1px solid var(--gray-light);vertical-align:top;line-height:1.4;}
+  .dict-table tr:nth-child(even) td{background:var(--gray-light);}
+  .fn{font-family:'Roboto Condensed',sans-serif;font-weight:700;color:var(--navy);font-size:13px;}
+  .tb{background:var(--gray-light);color:var(--light-text);font-size:11px;padding:2px 6px;border-radius:3px;font-family:monospace;}
+  .issue-note{color:var(--red);font-size:12px;font-style:italic;margin-top:2px;}
+
+  /* SLIDE CARDS */
+  .slide-card{background:#fff;border-radius:10px;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;gap:16px;align-items:flex-start;}
+  .slide-num{background:var(--navy);color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:26px;width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .slide-card h4{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:5px;}
+  .slide-card p{font-size:13px;color:var(--light-text);line-height:1.5;}
+
+  /* GLOSSARY */
+  .gloss-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:580px){.gloss-grid{grid-template-columns:1fr;}}
+  .gloss-item{background:#fff;border-radius:8px;padding:13px 15px;box-shadow:0 1px 5px rgba(0,0,0,.05);}
+  .gloss-item .term{font-family:'Roboto Condensed',sans-serif;font-weight:700;color:var(--navy);font-size:15px;}
+  .gloss-item .def{font-size:13px;color:var(--light-text);margin-top:4px;line-height:1.4;}
+
+  /* EXAMPLE BOX */
+  .example-box{background:var(--navy-dark);border-radius:10px;padding:18px 20px;margin:12px 0;}
+  .example-box .label{font-size:11px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+  .example-box p{color:rgba(255,255,255,.88);font-size:14px;line-height:1.6;font-style:italic;}
+
+  .footer{background:var(--navy-dark);color:rgba(255,255,255,.45);text-align:center;padding:28px 22px;font-size:12px;margin-top:56px;}
+  .footer strong{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="hero-ball">🏀</span>
+  <h1>NBA Analytics Challenge</h1>
+  <h2>Aberdeen Advisors Intern Program · Aberdeen Angels Scenario</h2>
+  <div class="hero-meta">
+    <div class="hero-stat"><span class="val">8</span><span class="lbl">Phases</span></div>
+    <div class="hero-div"></div>
+    <div class="hero-stat"><span class="val">430+</span><span class="lbl">Player Records</span></div>
+    <div class="hero-div"></div>
+    <div class="hero-stat"><span class="val">30</span><span class="lbl">Teams</span></div>
+    <div class="hero-div"></div>
+    <div class="hero-stat"><span class="val">1</span><span class="lbl">Recommendation</span></div>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="show('overview',this)">🏠 Overview</button>
+    <button class="nav-btn" onclick="show('phases',this)">📋 The 8 Phases</button>
+    <button class="nav-btn" onclick="show('data',this)">🗄️ Your Data</button>
+    <button class="nav-btn" onclick="show('kpis',this)">📊 KPI Guide</button>
+    <button class="nav-btn" onclick="show('dirty',this)">🔍 Data Issues</button>
+    <button class="nav-btn" onclick="show('submit',this)">📤 Submitting Work</button>
+    <button class="nav-btn" onclick="show('glossary',this)">📖 Glossary</button>
+  </div>
+</nav>
+
+<!-- OVERVIEW -->
+<div id="overview" class="section active"><div class="container">
+  <div class="sec-hdr"><div class="sec-icon">🏠</div><div>
+    <h2>Welcome to the Challenge</h2>
+    <p>You're an analytics consultant for a fictional NBA team. Your mission: dig through real player data, build a dashboard, and tell the General Manager which player to sign before the trade deadline. This is how consultants actually work.</p>
+  </div></div>
+
+  <div class="card">
+    <h3>The Situation</h3>
+    <p>Imagine you're an analytics consultant hired by the <strong>Aberdeen Angels</strong>, an NBA team on the edge of title contention. The General Managers — <strong>Kavir Naik</strong> and <strong>David Wise</strong> — come to you and say:</p>
+    <br>
+    <p style="background:var(--navy-dark);color:var(--gold);padding:14px 18px;border-radius:8px;font-style:italic;font-size:15px;line-height:1.6;"><span style="color:rgba(255,255,255,.5);font-size:12px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;">— Kavir Naik &amp; David Wise, GMs · Aberdeen Angels</span>"We need to sign one more player before the trade deadline. We have <strong style="color:#fff">$30 million</strong> to spend. I want someone who's been in the league <strong style="color:#fff">3 to 5 years</strong> — experienced enough to help us now, but not so expensive yet. Find me the best deal."</p>
+    <br>
+    <p>Your job: use the data to find that player and make a recommendation you can defend with numbers.</p>
+  </div>
+
+  <div class="card gold">
+    <h3>What You'll Learn</h3>
+    <ul>
+      <li><strong>Excel:</strong> Finding and fixing messy data — a skill every analyst needs</li>
+      <li><strong>Analytics thinking:</strong> How to choose the right stats and what they actually mean</li>
+      <li><strong>Power BI:</strong> Building an interactive dashboard — the kind clients actually use</li>
+      <li><strong>AI tools:</strong> Using AI to help draft professional write-ups</li>
+      <li><strong>Presenting:</strong> Delivering a recommendation to executives who will push back on you</li>
+    </ul>
+  </div>
+
+  <div class="card green">
+    <h3>What You'll Produce</h3>
+    <ul>
+      <li>A cleaned dataset with every fix documented</li>
+      <li>A 3-tab Power BI dashboard the GM can actually use</li>
+      <li>An AI-assisted insights write-up</li>
+      <li>A 3-slide presentation to Aberdeen partners — with your recommendation</li>
+    </ul>
+    <p style="margin-top:10px;font-style:italic;">This goes on your resume. Build it like it matters.</p>
+  </div>
+
+  <div class="sec-hdr" style="margin-top:44px"><div class="sec-icon">📏</div><div>
+    <h2>Ground Rules</h2>
+    <p>Three rules that apply to every phase, every deliverable.</p>
+  </div></div>
+
+  <div class="card"><h3>Rule 1 — Back It Up With Numbers</h3><p>Any claim you make needs data behind it. "I think Player X is good" doesn't cut it. "Player X has the highest Win Shares per $10M among players who meet the GM criteria" does.</p></div>
+  <div class="card gold"><h3>Rule 2 — Document Before You Fix</h3><p>In Phase 3 (data cleaning), you must write down every problem you find in the Cleaning Log <em>before</em> you fix it. Real analysts do this so their work can be checked. If it's not in the log, it didn't happen.</p></div>
+  <div class="card red"><h3>Rule 3 — One Clear Answer</h3><p>Your final presentation ends with one player. Not "it could be any of these three." One recommendation, backed by your data. Executives don't want options — they want a decision.</p></div>
+</div></div>
+
+<!-- PHASES -->
+<div id="phases" class="section"><div class="container">
+  <div class="sec-hdr"><div class="sec-icon">📋</div><div>
+    <h2>The 8 Phases</h2>
+    <p>Click any phase to expand it. Work through them in order — you can't skip ahead. At the end of each phase, submit your work for a gate check before moving on.</p>
+  </div></div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><p><strong>Gate checks are required.</strong> Your reviewer has to sign off before you can move to the next phase. The gate check question tells you exactly what they're going to ask — prepare for it.</p></div>
+
+  <!-- Phase 1 -->
+  <div class="phase-card">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-num">01</div>
+      <div class="phase-title-area"><h3>Understand the Goal</h3><p>Figure out exactly what question you're trying to answer</p></div>
+      <div class="phase-toggle">▼</div>
+    </div>
+    <div class="phase-body open">
+      <h4>What's the point of this phase?</h4>
+      <p>Before you open any data, you need to understand what you're actually trying to find. A good consultant always starts with the question, not the spreadsheet.</p>
+
+      <h4>Read this first — your GM brief</h4>
+      <div style="background:var(--navy-dark);border-radius:10px;padding:18px 20px;margin:10px 0;">
+        <p style="color:rgba(255,255,255,.7);font-size:13px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">FROM: Kavir Naik &amp; David Wise, GMs — Aberdeen Angels</p>
+        <p style="color:#fff;font-size:14px;line-height:1.7;">"Hey — we need to add one player before the trade deadline. We have $30 million in budget. I want someone who's been in the league for 3 to 5 years — they've got experience but they're not at their max contract yet, so the price is still reasonable. Most importantly, I want whoever gives us the <em>most wins for our money</em>. Don't just bring me the most famous name. Bring me the best deal."</p>
+      </div>
+
+      <h4>Your task</h4>
+      <p>Write a paragraph (3–5 sentences) that answers these three things:</p>
+      <ol>
+        <li>What is the main question you're trying to answer? (Put it in your own words — not the GM's exact words)</li>
+        <li>What are 2 things you'll need to look at in the data to answer it?</li>
+        <li>What do you <em>guess</em> you'll find before you look at the data? (There's no wrong answer here — this is your hypothesis)</li>
+      </ol>
+
+      <div class="callout good"><div class="callout-icon">✅</div><p><strong>Example of a good paragraph:</strong> "My goal is to find the NBA player who gives the team the most wins per dollar spent, with a salary under $30 million and 3–5 years of league experience. To answer this, I'll need to look at each player's salary and how many wins they contribute to their team. My guess is that I'll find some lesser-known players on smaller teams who are actually better deals than the big stars."</p></div>
+
+      <h4>Deliverable</h4>
+      <div><span class="deliver-badge">📝 One paragraph — typed in the review tool</span></div>
+      <br>
+      <div><span class="gate-badge">⚑ Gate 1 Question</span></div>
+      <p style="margin-top:8px;font-style:italic;color:var(--light-text);">"In your own words — what are you trying to find out, and why does it matter to the GM?"</p>
+    </div>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="phase-card">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-num">02</div>
+      <div class="phase-title-area"><h3>Review the Dataset</h3><p>Get to know the data before you analyze it</p></div>
+      <div class="phase-toggle">▼</div>
+    </div>
+    <div class="phase-body">
+      <h4>What you're doing</h4>
+      <p>Open NBA_2024_Raw.csv in Excel. Before fixing or analyzing anything, spend 15–20 minutes just exploring. You need to know what's in the data before you can use it.</p>
+      <h4>Your tasks</h4>
+      <ol>
+        <li>Open the file. How many rows are there? (Count or check the bottom of the sheet)</li>
+        <li>Look at the column names. Check the Data Dictionary tab in this guide. For any 3 columns you don't understand, look them up and write what they mean in your own words.</li>
+        <li>Scroll through the data. Write down 2 things that look weird or surprising.</li>
+        <li>Which 3 columns do you think will be most important for answering the GM's question? Why?</li>
+      </ol>
+      <div class="callout tip"><div class="callout-icon">💡</div><p><strong>Tip:</strong> Use Excel's filter (Data → Filter) to sort each column and look at the highest and lowest values. That's usually where weird stuff hides.</p></div>
+      <h4>Deliverable</h4>
+      <div><span class="deliver-badge">📝 Answers to the 4 questions — typed in the review tool</span></div>
+      <br>
+      <div><span class="gate-badge">⚑ Gate 2 Question</span></div>
+      <p style="margin-top:8px;font-style:italic;">"What's in this dataset? Walk me through it in 30 seconds — and tell me one thing that surprised you."</p>
+    </div>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="phase-card">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-num">03</div>
+      <div class="phase-title-area"><h3>Clean the Data</h3><p>Find 4 data problems, log them, and fix them</p></div>
+      <div class="phase-toggle">▼</div>
+    </div>
+    <div class="phase-body">
+      <h4>What you're doing</h4>
+      <p>The raw data has 4 problems we hid in it on purpose. Your job is to find all 4, write them down in the Cleaning Log (in the Excel template), and then fix them. The clean data is what everything else is built on — if it's wrong here, everything downstream is wrong.</p>
+      <h4>Your tasks</h4>
+      <ol>
+        <li>Open the Excel Cleaning Template. Paste the raw CSV data into the "🔍 Raw Data Snapshot" tab.</li>
+        <li>Go through the columns using filters and sorting. Look for anything that seems off.</li>
+        <li>When you find a problem: write it in the Cleaning Log tab <strong>before fixing it</strong>. Fill in: what column, how many rows affected, what the problem is, what you did to fix it.</li>
+        <li>Make your fix, then mark the issue as FIXED in the log.</li>
+        <li>Paste your cleaned data into the "✅ Cleaned Data" tab.</li>
+      </ol>
+      <div class="callout warn"><div class="callout-icon">⚠️</div><p><strong>Log before you fix.</strong> This is non-negotiable. If you fix something without logging it first, you have no record of what you did or why. Real analysts do this so their work can be audited.</p></div>
+      <p>See the <strong>"🔍 Data Issues"</strong> tab in this guide for hints on what to look for.</p>
+      <h4>Deliverable</h4>
+      <div><span class="deliver-badge">📊 Excel-Cleaning-Template.xlsx (all 4 issues logged + cleaned data tab)</span></div>
+      <br>
+      <div><span class="gate-badge">⚑ Gate 3 Question</span></div>
+      <p style="margin-top:8px;font-style:italic;">"Walk me through one of the issues you found — what was wrong, how did you spot it, and what did you decide to do about it?"</p>
+    </div>
+  </div>
+
+  <!-- Phase 4 -->
+  <div class="phase-card">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-num">04</div>
+      <div class="phase-title-area"><h3>Pick Your KPIs</h3><p>Choose the stats that actually answer the GM's question</p></div>
+      <div class="phase-toggle">▼</div>
+    </div>
+    <div class="phase-body">
+      <h4>What's a KPI?</h4>
+      <p>KPI stands for "Key Performance Indicator." It's just a stat that directly answers your question. Not every stat in the dataset is useful — your job is to pick 3–4 that answer "who gives us the most wins per dollar?"</p>
+
+      <div class="callout rule"><div class="callout-icon">🚫</div><p><strong>Don't use Points Per Game alone.</strong> A player who scores 30 points on terrible shooting actually hurts your team. A player who scores 12 points super efficiently might help you way more. Points per game without context is misleading.</p></div>
+
+      <h4>Your tasks</h4>
+      <ol>
+        <li>Read the KPI Guide tab in this packet. It explains 4 KPIs in plain language.</li>
+        <li>Choose 3–4 KPIs for your analysis. Write each one down with: (a) what it measures, (b) why it helps answer the GM's question.</li>
+        <li>Make sure one of your KPIs is "Bang for Buck" (Win Shares per $10M) — this is the most important one for comparing players across different salary levels.</li>
+        <li>Open the KPI Calculator tab in the Excel template. It has the formula ready for you.</li>
+      </ol>
+
+      <h4>Deliverable</h4>
+      <div><span class="deliver-badge">📝 List of your 3–4 KPIs with explanation — typed in the review tool</span></div>
+      <br>
+      <div><span class="gate-badge">⚑ Gate 4 Question</span></div>
+      <p style="margin-top:8px;font-style:italic;">"Why did you pick these KPIs? What would you be missing if you only looked at Points Per Game and salary?"</p>
+    </div>
+  </div>
+
+  <!-- Phase 5 -->
+  <div class="phase-card">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-num">05</div>
+      <div class="phase-title-area"><h3>Find Your Top 3</h3><p>Use the data to identify your best candidates</p></div>
+      <div class="phase-toggle">▼</div>
+    </div>
+    <div class="phase-body">
+      <h4>What you're doing</h4>
+      <p>Apply the GM's filters to the cleaned data, rank players by your main KPI, and find your top 3 candidates. Then write a paragraph explaining who they are and why they made the list.</p>
+      <h4>The GM's filters (all three must apply)</h4>
+      <ul>
+        <li>Salary under $30 million</li>
+        <li>In years 3, 4, or 5 of their career (contract_year_number column)</li>
+        <li>Played in at least 40 games this season (games_played column)</li>
+      </ul>
+      <h4>Your tasks</h4>
+      <ol>
+        <li>In Excel, filter your cleaned data so only players who meet all 3 criteria show up.</li>
+        <li>Sort the filtered list by "Win Shares per $10M" (your Bang for Buck stat), highest to lowest.</li>
+        <li>Look at the top 10 results. Pick your top 3 players. (They don't have to be #1, #2, #3 — use your judgment.)</li>
+        <li>Write a paragraph (4–6 sentences) explaining: who your top 3 are, what their stats look like, and which one you'd pick as your #1 recommendation and why.</li>
+      </ol>
+
+      <div class="callout good"><div class="callout-icon">✅</div><p><strong>Example of a good paragraph:</strong> "After applying the GM's filters, my top three candidates are [Player A], [Player B], and [Player C]. [Player A] has the highest Bang for Buck score at [X], meaning they contribute [X] wins per $10M we spend on them. [Player B] is a strong second choice with similar efficiency but plays more games. [Player C] has impressive scoring numbers at only $[X]M/year. My top recommendation is [Player A] because they give us the most wins for our money while staying well under the $30M budget."</p></div>
+
+      <h4>Deliverable</h4>
+      <div><span class="deliver-badge">📝 One paragraph — typed in the review tool</span></div>
+      <br>
+      <div><span class="gate-badge">⚑ Gate 5 Question</span></div>
+      <p style="margin-top:8px;font-style:italic;">"Who are your top 3 and why did this player make the list over other options?"</p>
+    </div>
+  </div>
+
+  <!-- Phase 6 -->
+  <div class="phase-card">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-num">06</div>
+      <div class="phase-title-area"><h3>Build the Dashboard</h3><p>3 tabs in Power BI — model it on the reference mockup</p></div>
+      <div class="phase-toggle">▼</div>
+    </div>
+    <div class="phase-body">
+      <h4>What you're doing</h4>
+      <p>Build a 3-tab Power BI dashboard using your cleaned data. We've given you a mockup to model yours after — open <strong>Mock-Dashboard-Reference.html</strong> in your browser to see exactly what each tab should look like.</p>
+
+      <h4>Your 3 tabs</h4>
+      <ul>
+        <li><strong>Tab 1 — "Who's the Best Deal?"</strong> A chart showing salary vs. Win Shares for all players. This is how you spot who's overpaid and who's undervalued. Add filters for position and team.</li>
+        <li><strong>Tab 2 — "Compare Players"</strong> A side-by-side comparison of your top 3 candidates. Show their key stats so anyone can see the difference at a glance.</li>
+        <li><strong>Tab 3 — "What Does Our Team Need?"</strong> Look at your hypothetical team's roster. Where are the gaps? What kind of player would fill them?</li>
+      </ul>
+
+      <div class="callout tip"><div class="callout-icon">📐</div><p><strong>Chart title rule:</strong> Every chart title should answer a question, not just describe the chart.<br>❌ BAD: "Player Salary vs. Win Shares"<br>✅ GOOD: "The best-value players are hiding in the $10–20M salary range"</p></div>
+
+      <h4>Gate check — your dashboard must pass all of these</h4>
+      <ul>
+        <li>☐ All 3 tabs work and have real data</li>
+        <li>☐ At least 2 chart titles state a finding (not just a topic)</li>
+        <li>☐ Tab 1 has a filter/slicer so users can explore</li>
+        <li>☐ You can explain what each chart shows in one sentence</li>
+      </ul>
+
+      <h4>Deliverable</h4>
+      <div><span class="deliver-badge">📊 NBA_Dashboard.pbix — 3 tabs</span></div>
+      <br>
+      <div><span class="gate-badge">⚑ Gate 6 Question</span></div>
+      <p style="margin-top:8px;font-style:italic;">"Walk me through Tab 1. What does it show and what's the main thing someone should take away from it?"</p>
+    </div>
+  </div>
+
+  <!-- Phase 7 -->
+  <div class="phase-card">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-num">07</div>
+      <div class="phase-title-area"><h3>Write Your Insights (with AI)</h3><p>Turn your findings into a professional write-up using AI as a helper</p></div>
+      <div class="phase-toggle">▼</div>
+    </div>
+    <div class="phase-body">
+      <h4>What you're doing</h4>
+      <p>You've done the hard work — the cleaning, the analysis, the dashboard. Now you need to write it up in a way an executive can read in 2 minutes. You'll use AI (Claude or Copilot) to help draft this, but you'll edit it yourself — AI is a starting point, not the final product.</p>
+      <h4>Your tasks</h4>
+      <ol>
+        <li>Open the Stage Gate Review Tool and copy this prompt into any AI assistant:</li>
+      </ol>
+      <div class="example-box">
+        <div class="label">📋 AI Prompt to Use</div>
+        <p>"I'm an analytics intern and I just finished analyzing NBA player data. My top recommendation is [YOUR PLAYER NAME]. They have a Win Shares per $10M of [YOUR NUMBER], which is the highest among players who cost under $30M and are in years 3-5 of their career. Their salary is $[X]M. Help me write a 3-paragraph insights memo for a business executive. Paragraph 1: the key finding (what does the data show that's surprising?). Paragraph 2: why this specific player is the right pick. Paragraph 3: what the GM should do next. Keep it direct and confident."</p>
+      </div>
+      <ol start="2">
+        <li>Read what AI gives you. It's a first draft — not finished work.</li>
+        <li>Edit it: make sure it sounds like you, check the numbers are right, add anything AI missed about why you made your choice.</li>
+        <li>The final memo should be 1 page max. Direct, specific, confident.</li>
+      </ol>
+      <div class="callout warn"><div class="callout-icon">⚠️</div><p><strong>AI will write something that sounds okay but might miss your specific data.</strong> That's why you edit it. If the AI writes a number that's different from your spreadsheet — use your spreadsheet number.</p></div>
+      <h4>Deliverable</h4>
+      <div><span class="deliver-badge">📝 1-page insights memo (Word doc)</span></div>
+      <br>
+      <div><span class="gate-badge">⚑ Gate 7 Question</span></div>
+      <p style="margin-top:8px;font-style:italic;">"Read me your opening sentence. Does it lead with the finding or with background?"</p>
+    </div>
+  </div>
+
+  <!-- Phase 8 -->
+  <div class="phase-card">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-num">08</div>
+      <div class="phase-title-area"><h3>Present to the Partners</h3><p>3 slides. One recommendation. In front of real executives.</p></div>
+      <div class="phase-toggle">▼</div>
+    </div>
+    <div class="phase-body">
+      <h4>What you're doing</h4>
+      <p>Build a 3-slide PowerPoint and present it at the Intern Celebration. Aberdeen partners will be in the room. They will ask you questions. You need to be able to defend your recommendation with data.</p>
+
+      <div class="slide-card">
+        <div class="slide-num">1</div>
+        <div>
+          <h4>Slide 1 — "Our team needs one more piece to reach the top"</h4>
+          <p>Set the context. Where does the team currently stand? What's the gap? This gives partners the "why are we doing this" before you show them the answer.</p>
+          <p style="margin-top:6px;color:var(--navy);font-weight:600;">Include: 1–2 numbers about the team's current position</p>
+        </div>
+      </div>
+
+      <div class="slide-card">
+        <div class="slide-num">2</div>
+        <div>
+          <h4>Slide 2 — "[Player Name] is our pick — here's what the data says"</h4>
+          <p>This is your main slide. Name your recommendation, show their key stats, and show why they're a better deal than other options. This is where you use a chart from your dashboard.</p>
+          <p style="margin-top:6px;color:var(--navy);font-weight:600;">Include: player stats, Bang for Buck number, comparison to other candidates</p>
+        </div>
+      </div>
+
+      <div class="slide-card">
+        <div class="slide-num">3</div>
+        <div>
+          <h4>Slide 3 — "Here's what it costs, what we get, and why it's worth it"</h4>
+          <p>The deal slide. How much do we spend? What do we get in return? What's the risk if it doesn't work out? End with one clear action — what should the GM do, and when?</p>
+          <p style="margin-top:6px;color:var(--navy);font-weight:600;">Include: cost, projected benefit, and a single recommended action</p>
+        </div>
+      </div>
+
+      <div class="callout rule"><div class="callout-icon">🚫</div><p><strong>Slide 3 must end with one action.</strong> Not "here are our options." One player, one ask, one timeline. If you say "it depends," a partner will ask what it depends on — have that answer ready.</p></div>
+
+      <h4>Practice tips</h4>
+      <ul>
+        <li>Time yourself — aim for 5–7 minutes, leaving time for questions</li>
+        <li>For every number on every slide, know where it came from</li>
+        <li>Practice saying your recommendation out loud: "My recommendation is [Player X] because..."</li>
+      </ul>
+
+      <h4>Deliverable</h4>
+      <div><span class="deliver-badge">📊 Partner-Presentation.pptx — 3 slides</span></div>
+      <br>
+      <div><span class="gate-badge">⚑ Gate 8 — Final Presentation</span></div>
+      <ul style="margin-top:8px;">
+        <li>☐ All 3 slide titles tell the audience something (not just "Slide 1")</li>
+        <li>☐ Slide 2 has real data from your dashboard</li>
+        <li>☐ Slide 3 ends with one specific action</li>
+        <li>☐ You can answer "what's the salary?" and "what's their Bang for Buck?" without looking at your notes</li>
+      </ul>
+    </div>
+  </div>
+</div></div>
+
+<!-- DATA -->
+<div id="data" class="section"><div class="container">
+  <div class="sec-hdr"><div class="sec-icon">🗄️</div><div>
+    <h2>Your Data</h2>
+    <p>What's in the two files you'll be working with. Read this before you open the spreadsheet.</p>
+  </div></div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><p>You don't need to understand every column — just the ones that matter for the GM question. Focus on the starred columns first.</p></div>
+
+  <h3 style="font-family:'Roboto Condensed',sans-serif;font-size:18px;color:var(--navy);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">NBA_2024_Raw.csv — Player Stats</h3>
+  <table class="dict-table">
+    <thead><tr><th>Column Name</th><th>Type</th><th>What it means</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><span class="fn">player_id</span></td><td><span class="tb">Number</span></td><td>A unique number assigned to each player — like a student ID</td><td>1042</td></tr>
+      <tr><td><span class="fn">player_name</span> ⭐</td><td><span class="tb">Text</span></td><td>Player's full name</td><td>LeBron James</td></tr>
+      <tr><td><span class="fn">team_abbr</span></td><td><span class="tb">Text</span></td><td>3-letter team code (LAL = Lakers, BOS = Celtics, etc.)</td><td>LAL</td></tr>
+      <tr><td><span class="fn">position</span></td><td><span class="tb">Text</span></td><td>Player's position: PG (point guard), SG (shooting guard), SF (small forward), PF (power forward), C (center)</td><td>SF</td></tr>
+      <tr><td><span class="fn">age</span></td><td><span class="tb">Number</span></td><td>Player's age as of February 2024</td><td>26</td></tr>
+      <tr><td><span class="fn">games_played</span> ⭐</td><td><span class="tb">Number</span></td><td>How many games they played this season (max is 82)</td><td>71</td></tr>
+      <tr><td><span class="fn">games_started</span></td><td><span class="tb">Number</span></td><td>How many games they started (should never be more than games_played)</td><td>71</td></tr>
+      <tr><td><span class="fn">minutes_per_game</span></td><td><span class="tb">Number</span></td><td>Average minutes played per game. More minutes = coach trusts them more</td><td>35.3</td></tr>
+      <tr><td><span class="fn">points_per_game</span></td><td><span class="tb">Number</span></td><td>Average points scored per game</td><td>25.7</td></tr>
+      <tr><td><span class="fn">rebounds_per_game</span></td><td><span class="tb">Number</span></td><td>Average rebounds per game</td><td>7.3</td></tr>
+      <tr><td><span class="fn">assists_per_game</span></td><td><span class="tb">Number</span></td><td>Average assists per game</td><td>8.3</td></tr>
+      <tr><td><span class="fn">fg_pct</span></td><td><span class="tb">Decimal</span></td><td>Field goal percentage — should be between 0.30 and 0.70 (meaning 30% to 70%). <span class="issue-note">⚠ Some rows have this wrong — it's a data issue!</span></td><td>0.524</td></tr>
+      <tr><td><span class="fn">three_pt_pct</span></td><td><span class="tb">Decimal</span></td><td>Three-point percentage — how often they make 3-pointers</td><td>0.380</td></tr>
+      <tr><td><span class="fn">ft_pct</span></td><td><span class="tb">Decimal</span></td><td>Free throw percentage</td><td>0.751</td></tr>
+      <tr><td><span class="fn">win_shares</span> ⭐</td><td><span class="tb">Number</span></td><td><strong>How many wins this player contributed to their team this season.</strong> A 5.0 win share means they're responsible for about 5 of their team's wins. Higher = better.</td><td>8.1</td></tr>
+      <tr><td><span class="fn">salary_millions</span> ⭐</td><td><span class="tb">Number</span></td><td>The player's annual salary in millions of dollars. <span class="issue-note">⚠ Some rows are blank — data issue!</span></td><td>22.5</td></tr>
+      <tr><td><span class="fn">contract_years_remaining</span></td><td><span class="tb">Number</span></td><td>How many more seasons are left on their contract after this one</td><td>2</td></tr>
+      <tr><td><span class="fn">contract_year_number</span> ⭐</td><td><span class="tb">Number</span></td><td><strong>Which year of their NBA career contract this is.</strong> Years 3–5 is the "sweet spot" — experienced but not yet at maximum salary.</td><td>4</td></tr>
+      <tr><td><span class="fn">cap_hit_pct</span></td><td><span class="tb">Decimal</span></td><td>What percentage of the team's total salary budget this player takes up</td><td>0.154</td></tr>
+      <tr><td><span class="fn">win_shares_per_10m</span> ⭐</td><td><span class="tb">Number</span></td><td><strong>The "Bang for Buck" stat. For every $10M we spend, how many wins does this player contribute?</strong> This is the most important column for the GM's question.</td><td>2.1</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-family:'Roboto Condensed',sans-serif;font-size:18px;color:var(--navy);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;margin-top:28px">NBA_2024_Teams.csv — Team Info</h3>
+  <table class="dict-table">
+    <thead><tr><th>Column</th><th>Type</th><th>What it means</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><span class="fn">team_abbr</span></td><td><span class="tb">Text</span></td><td>3-letter code — connects to the player file</td><td>BOS</td></tr>
+      <tr><td><span class="fn">team_name</span></td><td><span class="tb">Text</span></td><td>Full team name</td><td>Boston Celtics</td></tr>
+      <tr><td><span class="fn">wins / losses</span></td><td><span class="tb">Number</span></td><td>Regular season record (out of 82 games)</td><td>64 / 18</td></tr>
+      <tr><td><span class="fn">net_rating</span></td><td><span class="tb">Number</span></td><td>The best single measure of how good a team is — points scored minus points allowed per 100 possessions. Positive = winning team.</td><td>+11.6</td></tr>
+      <tr><td><span class="fn">conference</span></td><td><span class="tb">Text</span></td><td>East or West</td><td>East</td></tr>
+      <tr><td><span class="fn">total_payroll_millions</span></td><td><span class="tb">Number</span></td><td>Total amount the team spends on player salaries ($M)</td><td>188.3</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:13px;color:var(--gray);">⭐ = most important columns for answering the GM's question</p>
+</div></div>
+
+<!-- KPI GUIDE -->
+<div id="kpis" class="section"><div class="container">
+  <div class="sec-hdr"><div class="sec-icon">📊</div><div>
+    <h2>KPI Guide</h2>
+    <p>The 4 stats that actually answer "who gives us the most wins for our money?" — explained in plain English.</p>
+  </div></div>
+
+  <div class="callout warn"><div class="callout-icon">⚠️</div><p><strong>Use these as a reference, not an answer key.</strong> Build your own KPI list first, then come here to check if your thinking is on track.</p></div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card star">
+      <div class="kpi-num">KPI 1 <span class="star-badge">⭐ Most Important</span></div>
+      <div class="kpi-name">Bang for Buck (Win Shares per $10M)</div>
+      <div class="kpi-def">For every $10 million we spend on this player, how many wins do they contribute? This directly answers the GM's question — who gives the most value for the money.</div>
+      <div class="kpi-eg">Formula: win_shares ÷ (salary_millions ÷ 10)<br>Good: above 1.5 | Great: above 2.5</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-num">KPI 2</div>
+      <div class="kpi-name">Win Shares</div>
+      <div class="kpi-def">How many of their team's wins is this player responsible for? Think of it like a score for the player's overall contribution to winning. A player with 8 win shares helped their team win 8 more games than they would have without them.</div>
+      <div class="kpi-eg">Column: win_shares<br>Good starter: 3+ | Star player: 7+</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-num">KPI 3</div>
+      <div class="kpi-name">Availability (Games Played %)</div>
+      <div class="kpi-def">Is this player actually healthy and playing? A great player who misses half the season doesn't help you. Divide games played by 82 to get their availability percentage.</div>
+      <div class="kpi-eg">Formula: games_played ÷ 82<br>Reliable: above 0.75 (62+ games)</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-num">KPI 4</div>
+      <div class="kpi-name">Salary ($M)</div>
+      <div class="kpi-def">Simply how much the player costs. You can't forget this one — it's in the GM brief. Must be under $30M for this analysis, but lower salary with the same production = better deal.</div>
+      <div class="kpi-eg">Column: salary_millions<br>GM limit: under $30M</div>
+    </div>
+  </div>
+
+  <div class="card red" style="margin-top:20px">
+    <h3>Stats NOT to use as your main KPI</h3>
+    <ul>
+      <li><strong>Raw Points Per Game alone:</strong> A player scoring 28 points on 10-for-30 shooting is actually hurting the team. Scoring volume without efficiency doesn't mean winning.</li>
+      <li><strong>Field Goal % alone:</strong> A center who only dunks will have a high FG% but contributes less than a guard who takes harder shots. It doesn't account for the type of shots taken.</li>
+      <li><strong>Total salary:</strong> $25M doesn't tell you anything on its own — is that expensive or cheap for what you're getting? Always compare salary to production.</li>
+    </ul>
+  </div>
+</div></div>
+
+<!-- DIRTY DATA -->
+<div id="dirty" class="section"><div class="container">
+  <div class="sec-hdr"><div class="sec-icon">🔍</div><div>
+    <h2>The 4 Data Problems</h2>
+    <p>There are exactly 4 problems hidden in NBA_2024_Raw.csv. Here are hints for each one. Use these after you've spent time looking yourself — don't jump straight here.</p>
+  </div></div>
+
+  <div class="callout rule"><div class="callout-icon">🚫</div><p><strong>Try to find them yourself first.</strong> Use Excel filters and sorting to explore each column. If you're stuck after 15 minutes, come back here for a hint. The point is building the skill of spotting data problems — not just finding these specific ones.</p></div>
+
+  <div class="issue-card">
+    <h4>🔢 Problem 1 — The FG% Format Is Wrong in Some Rows</h4>
+    <p>Field goal percentage should always be a decimal between 0.30 and 0.70 (meaning 30% to 70%). But in some rows, someone stored it as a whole number instead — like 46.3 instead of 0.463.</p>
+    <div class="fix-hint">💡 Hint: Sort the fg_pct column from highest to lowest. Any value bigger than 1.0 is definitely stored wrong. Count how many rows have this problem.</div>
+    <div class="what-good">✅ Fixed when: All fg_pct values are between 0.30 and 0.70</div>
+  </div>
+
+  <div class="issue-card">
+    <h4>💸 Problem 2 — Some Salaries Are Blank</h4>
+    <p>About 10 players have no salary in the data. These are players on special low-salary contracts. You need to decide what to do with them — you can't just ignore them.</p>
+    <div class="fix-hint">💡 Hint: Filter the salary_millions column and look for blank cells. In your Cleaning Log, write down how many blank salaries you found and what you decided to do (fill with $0, or exclude from salary analysis).</div>
+    <div class="what-good">✅ Fixed when: No blank salary cells remain (fill with 0 or document exclusion)</div>
+  </div>
+
+  <div class="issue-card">
+    <h4>👤 Problem 3 — Some Names Are Formatted Differently</h4>
+    <p>Most players are listed as "First Last" (like "LeBron James"). But about 10 rows have it backwards: "Last, First" (like "James, LeBron"). This would break any sorting by name and looks messy.</p>
+    <div class="fix-hint">💡 Hint: Sort the player_name column A to Z and scroll to the bottom — names with commas will cluster together. Fix them to "First Last" format.</div>
+    <div class="what-good">✅ Fixed when: No player names contain a comma</div>
+  </div>
+
+  <div class="issue-card">
+    <h4>🏀 Problem 4 — 3 Players Have More Starts Than Games Played</h4>
+    <p>games_started should never be bigger than games_played. You can't start more games than you actually played in — that's logically impossible and means there's an error in the data.</p>
+    <div class="fix-hint">💡 Hint: Add a new column in Excel with the formula =IF(games_started>games_played,"ERROR","OK") and filter for "ERROR." Fix by setting games_started equal to games_played for those rows.</div>
+    <div class="what-good">✅ Fixed when: No rows where games_started is greater than games_played</div>
+  </div>
+</div></div>
+
+<!-- SUBMIT -->
+<div id="submit" class="section"><div class="container">
+  <div class="sec-hdr"><div class="sec-icon">📤</div><div>
+    <h2>How to Submit Your Work</h2>
+    <p>At the end of each phase, you submit your work and get reviewed before moving on. Here's how it works.</p>
+  </div></div>
+  <div class="card green">
+    <h3>Step 1 — Use the Stage Gate Review Tool First</h3>
+    <p>Open Stage-Gate-Review-Tool.html in your browser. Enter the API key your program coordinator gave you. Select your current phase. Describe or paste your work, then click "Submit for Review." You'll get written feedback in about 10 seconds — read it carefully before your human review.</p>
+  </div>
+  <div class="card">
+    <h3>Step 2 — Meet With Your Reviewer</h3>
+    <p>After reading your AI feedback and making any improvements, meet with your assigned Senior Manager for a gate check. Bring your work and be ready to answer the gate check question for your phase.</p>
+  </div>
+  <div class="card gold">
+    <h3>File Naming</h3>
+    <p>Name every file: <strong>YYYY-MM-DD_YourName_Deliverable_v1.ext</strong></p>
+    <p style="margin-top:8px;">Example: <code>2024-07-15_JSmith_Cleaning-Template_v1.xlsx</code></p>
+    <p style="margin-top:6px;">If you revise after feedback, use v2, v3, etc. Never overwrite — always save a new version.</p>
+  </div>
+</div></div>
+
+<!-- GLOSSARY -->
+<div id="glossary" class="section"><div class="container">
+  <div class="sec-hdr"><div class="sec-icon">📖</div><div>
+    <h2>Glossary</h2>
+    <p>Quick definitions for terms you'll see in the data and in this project.</p>
+  </div></div>
+  <div class="gloss-grid">
+    <div class="gloss-item"><div class="term">Win Shares</div><div class="def">An estimate of how many team wins a player is responsible for. Higher = more valuable to the team.</div></div>
+    <div class="gloss-item"><div class="term">Bang for Buck (WS/10M)</div><div class="def">Win Shares divided by salary per $10M. The key metric for finding players who are great deals.</div></div>
+    <div class="gloss-item"><div class="term">KPI</div><div class="def">Key Performance Indicator — a specific metric that measures something important. Not just any stat.</div></div>
+    <div class="gloss-item"><div class="term">Gate Check</div><div class="def">A review at the end of each phase. You must pass it before moving forward.</div></div>
+    <div class="gloss-item"><div class="term">Salary Cap</div><div class="def">The maximum total amount an NBA team can spend on player salaries (about $136M in 2024).</div></div>
+    <div class="gloss-item"><div class="term">Net Rating</div><div class="def">A team's points scored minus points allowed per 100 possessions. The best single measure of team quality.</div></div>
+    <div class="gloss-item"><div class="term">FG% (Field Goal %)</div><div class="def">The percentage of shot attempts that go in. Stored as a decimal (0.46 = 46%). Should be between 0.30 and 0.70.</div></div>
+    <div class="gloss-item"><div class="term">Contract Year Number</div><div class="def">Which year of their NBA career the player is in. Years 3-5 = experienced but not yet max salary.</div></div>
+    <div class="gloss-item"><div class="term">Hypothesis</div><div class="def">Your guess about what you'll find before you look at the data. You write one in Phase 1.</div></div>
+    <div class="gloss-item"><div class="term">Insights Memo</div><div class="def">A short professional write-up that explains what you found and what it means. Not a summary — an argument.</div></div>
+    <div class="gloss-item"><div class="term">Action Title</div><div class="def">A slide title that tells the audience the finding, not just the topic. "Best values are in years 3–5" is an action title.</div></div>
+    <div class="gloss-item"><div class="term">Trade Deadline</div><div class="def">The specific date in the NBA season after which no player trades can happen. The GM needs a decision before this date.</div></div>
+  </div>
+</div></div>
+
+<div class="footer">
+  <strong>NBA Analytics Challenge — Aberdeen Angels Scenario</strong> · Aberdeen Advisors Intern Program 2024<br>
+  Questions? Use the Stage Gate Review Tool — describe what you're stuck on and ask for a hint.<br>
+  <span style="margin-top:8px;display:block">This is your work. Build it like it matters — because it does.</span>
+</div>
+
+<script>
+function show(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function togglePhase(el){
+  const body=el.nextElementSibling;
+  const tog=el.querySelector('.phase-toggle');
+  if(body.classList.contains('open')){body.classList.remove('open');tog.style.transform='rotate(-90deg)';}
+  else{body.classList.add('open');tog.style.transform='';}
+}
+document.querySelectorAll('.phase-body').forEach((b,i)=>{if(i>0)b.classList.remove('open');});
+</script>
+</body>
+</html>

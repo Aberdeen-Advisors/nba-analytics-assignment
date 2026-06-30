@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NBA Analytics Dashboard — Aberdeen Angels Reference Mockup</title>
+<title>NBA Analytics Dashboard — Aberdeen Angels Example Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -52,6 +52,9 @@ body{font-family:'Inter',sans-serif;background:var(--off);color:#1A1F2E;}
 .csub{font-size:12px;color:var(--gray);margin-bottom:14px;line-height:1.4;}
 canvas{width:100%!important;}
 .chart-tip{font-size:11px;color:var(--gray);margin-top:10px;font-style:italic;border-top:1px solid var(--gray-light);padding-top:8px;line-height:1.5;}
+.dax-tip{font-size:11px;background:#EEF5FF;border-left:3px solid var(--navy);border-radius:0 6px 6px 0;padding:8px 10px;margin-top:10px;line-height:1.6;color:var(--light);}
+.dax-tip strong{color:var(--navy);}
+.dax-tip code{background:var(--gray-light);padding:1px 5px;border-radius:3px;font-family:monospace;font-size:10px;}
 .compare-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px;}
 .compare-table th{background:var(--navy);color:var(--gold);padding:9px 12px;text-align:left;
   font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
@@ -61,19 +64,10 @@ canvas{width:100%!important;}
 .rank-badge{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--navy);
   color:#fff;font-size:11px;font-weight:700;text-align:center;line-height:22px;margin-right:6px;}
 .rank-badge.r1{background:var(--gold);color:var(--navy-dark);}
-.needs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.need-card{background:#fff;border-radius:10px;padding:18px;box-shadow:0 2px 6px rgba(0,0,0,.05);}
-.need-card h3{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px;}
-.pos-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-.pos-label{font-size:12px;font-weight:700;width:32px;color:var(--light);}
-.bar-bg{flex:1;background:var(--gray-light);border-radius:4px;height:12px;overflow:hidden;}
-.bar-fill{height:12px;border-radius:4px;}
-.pos-val{font-size:12px;font-weight:600;width:36px;text-align:right;}
-.insight-box{background:linear-gradient(135deg,var(--navy),#2A52A8);border-radius:10px;padding:20px;color:#fff;}
-.insight-box h3{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);margin-bottom:10px;letter-spacing:.5px;}
-.insight-box p{font-size:13px;line-height:1.6;color:rgba(255,255,255,.8);margin-bottom:8px;}
-.insight-rec{background:rgba(255,199,44,.12);border:1px solid rgba(255,199,44,.35);border-radius:6px;
-  padding:10px 12px;font-size:13px;color:var(--gold);font-weight:600;margin-top:12px;}
+.pb-note{background:linear-gradient(135deg,#EEF5FF,#F8F0FF);border:2px solid var(--navy);border-radius:10px;padding:18px 20px;margin-bottom:18px;}
+.pb-note h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);margin-bottom:8px;}
+.pb-note p{font-size:13px;color:var(--light);line-height:1.6;margin-bottom:8px;}
+.pb-note code{background:#D6E4FF;padding:2px 6px;border-radius:3px;font-family:monospace;font-size:11px;color:var(--navy);}
 </style>
 </head>
 <body>
@@ -81,23 +75,23 @@ canvas{width:100%!important;}
 <div class="topbar">
   <div class="topbar-left">
     <h1>🏀 NBA Analytics Dashboard — 2024–25 Season</h1>
-    <p>Aberdeen Angels · GMs: Kavir Naik &amp; David Wise · Intern Program Reference Mockup</p>
+    <p>Aberdeen Angels · GMs: Kavir Naik &amp; David Wise · Example Dashboard for Inspiration</p>
   </div>
   <div class="topbar-right">Data: 432 players · 30 teams<br>Feb 2025 trade deadline window</div>
 </div>
 
 <div class="ref-note">
-  📐 <span><strong>Reference mockup for interns.</strong> Build your Power BI dashboard to match this layout — same 3 tabs, same chart types, same logic. The data here uses real NBA player names with sample stats. Your actual stats will come from your cleaned CSV. Blue annotation pills show which Power BI visual to use.</span>
+  💡 <span><strong>This is inspiration, not a blueprint.</strong> Use this as an example of what a finished dashboard could look like — not something to copy 1:1. Your charts, layout, and KPIs will reflect your own analysis. The data here uses sample stats; yours comes from your cleaned CSV. The blue annotation notes suggest Power BI visual types and DAX hints to help you get started.</span>
 </div>
 
 <div class="tabs">
   <button class="tab-btn active" onclick="showTab('t1',this)">🎯 Tab 1 — Who's the Best Deal?</button>
   <button class="tab-btn" onclick="showTab('t2',this)">📊 Tab 2 — Compare Players</button>
-  <button class="tab-btn" onclick="showTab('t3',this)">🏀 Tab 3 — What Does Our Team Need?</button>
 </div>
 
 <!-- ═══ TAB 1 ═══ -->
 <div id="t1" class="tab-content active">
+
   <div class="filter-bar">
     <label>Filter by:</label>
     <select id="pos-filter" onchange="applyFilter()">
@@ -115,142 +109,108 @@ canvas{width:100%!important;}
       <option value="all">All Career Years</option>
       <option value="3-5">Years 3–5 (GM criteria)</option>
     </select>
-    <span class="filter-tag">📐 Power BI: use Slicer visuals</span>
+    <span class="filter-tag">💡 One option: Slicer visuals in Power BI</span>
   </div>
 
+  <!-- KPI summary cards -->
   <div class="kpi-strip">
     <div class="kpi"><div class="val" id="kpi-count">432</div><div class="lbl">Players in Dataset</div></div>
     <div class="kpi star"><div class="val" id="kpi-qual">88</div><div class="lbl">Meet All 3 GM Criteria</div><div class="sub">Salary &lt;$30M · Yrs 3–5 · 40+ GP</div></div>
     <div class="kpi"><div class="val" id="kpi-avg">$16.2M</div><div class="lbl">Avg Qualifying Salary</div></div>
-    <div class="kpi"><div class="val" id="kpi-bb">2.3</div><div class="lbl">Avg Bang for Buck</div><div class="sub">Win Shares per $10M</div></div>
+    <div class="kpi"><div class="val" id="kpi-bb">2.3</div><div class="lbl">Avg Value per Dollar</div><div class="sub">Qualifying players only</div></div>
+  </div>
+  <div class="dax-tip" style="margin-bottom:18px;">
+    <strong>DAX hints for KPI cards:</strong> For "Players in Dataset" use <code>COUNTROWS(Players)</code>. For "Meet All 3 GM Criteria" use <code>CALCULATE(COUNTROWS(Players), Players[salary_millions]&lt;30, Players[contract_year_number]&gt;=3, Players[contract_year_number]&lt;=5, Players[games_played]&gt;=40)</code>. For averages, use <code>AVERAGEX</code> with the same filter conditions.
   </div>
 
   <div class="chart-row">
     <div class="chart-card">
       <div class="ctitle finding">The best-value players are hiding in the $4–15M salary range</div>
-      <div class="csub">Salary ($M) vs. Win Shares — bubble size = games played · Gold = your top 3 picks</div>
+      <div class="csub">Salary ($M) vs. Win Contribution — bubble size = games played · Gold = players meeting all GM criteria</div>
       <canvas id="scatter1" height="240"></canvas>
-      <div class="chart-tip">📐 Power BI: Scatter Chart. X axis = salary_millions, Y axis = win_shares, Size = games_played. Color code by position. Add a reference line at the salary average.</div>
+      <div class="chart-tip">💡 One approach: a Scatter Chart with salary on the X axis and your win contribution KPI on the Y axis. Sizing bubbles by games played and color-coding players who meet all 3 GM filters makes the qualifying pool jump out — but feel free to tell the story differently if another chart type works better for your data.</div>
+      <div class="dax-tip"><strong>DAX hint:</strong> Add a calculated column: <code>MeetsAllCriteria = IF(AND(AND(Players[salary_millions]&lt;30, Players[contract_year_number]&gt;=3), AND(Players[contract_year_number]&lt;=5, Players[games_played]&gt;=40)), "Qualifies", "Doesn't Qualify")</code> — then use this column for color.</div>
     </div>
     <div class="chart-card">
-      <div class="ctitle finding">Bang for Buck collapses above $25M</div>
-      <div class="csub">Average Win Shares per $10M — by salary bracket</div>
+      <div class="ctitle finding">Value per dollar drops sharply above $20M</div>
+      <div class="csub">Average value-per-dollar KPI — grouped by salary range</div>
       <canvas id="bar1" height="240"></canvas>
-      <div class="chart-tip">📐 Power BI: Clustered Bar Chart. Create a calculated salary bucket column, Y axis = average win_shares_per_10m per bucket.</div>
+      <div class="chart-tip">💡 One approach: a bar chart grouping players by salary bracket (e.g. under $10M, $10–20M, $20–30M) and averaging your value-per-dollar KPI for each group. You could also compare by position, team, or contract year — use whatever cut tells the most interesting story.</div>
+      <div class="dax-tip"><strong>DAX hint:</strong> Calculated column for bracket: <code>SalaryBracket = SWITCH(TRUE(), Players[salary_millions]&lt;10, "Under $10M", Players[salary_millions]&lt;20, "$10–20M", Players[salary_millions]&lt;30, "$20–30M", "Over $30M")</code></div>
     </div>
   </div>
 </div>
 
 <!-- ═══ TAB 2 ═══ -->
 <div id="t2" class="tab-content">
+
+  <div class="pb-note">
+    <h3>📐 Power BI Setup for This Tab</h3>
+    <p>Tab 2 compares only your 3 selected players. The easiest way to do this in Power BI is to create a <strong>separate table</strong> that contains just those 3 players' stats — either by manually entering the numbers or by using a DAX filtered table.</p>
+    <p>Then build your charts using that table instead of the full player dataset. This keeps your comparison clean and prevents other players from showing up.</p>
+    <p><strong>DAX hint for a filtered table:</strong> <code>SelectedPlayers = FILTER(Players, Players[player_name] IN {"Player A", "Player B", "Player C"})</code> — replace with your actual player names.</p>
+  </div>
+
   <div class="kpi-strip">
-    <div class="kpi star"><div class="val">3</div><div class="lbl">Final Candidates</div><div class="sub">After all GM filters</div></div>
-    <div class="kpi"><div class="val">4.11</div><div class="lbl">Best Bang for Buck</div><div class="sub">Tari Eason (HOU)</div></div>
+    <div class="kpi star"><div class="val">3</div><div class="lbl">Final Candidates</div><div class="sub">After all GM filters applied</div></div>
+    <div class="kpi"><div class="val">4.11</div><div class="lbl">Best Value per Dollar</div><div class="sub">Top candidate (example)</div></div>
     <div class="kpi"><div class="val">$10.5M</div><div class="lbl">Average Candidate Salary</div></div>
     <div class="kpi"><div class="val">$19.5M</div><div class="lbl">Avg Budget Remaining</div></div>
+  </div>
+  <div class="dax-tip" style="margin-bottom:18px;">
+    <strong>DAX hints for Tab 2 KPI cards:</strong> Point each card at your <code>SelectedPlayers</code> table. For "Best Value per Dollar" use <code>MAXX(SelectedPlayers, SelectedPlayers[your_kpi_column])</code>. For "Avg Budget Remaining" use <code>30 - AVERAGEX(SelectedPlayers, SelectedPlayers[salary_millions])</code>.
   </div>
 
   <div class="chart-row even">
     <div class="chart-card">
-      <div class="ctitle finding">Eason leads on efficiency — Murray leads on win contribution</div>
-      <div class="csub">Side-by-side KPI comparison — normalized to 0–100 scale for fair comparison</div>
+      <div class="ctitle finding">Player 1 leads on value efficiency — Player 2 leads on total win contribution</div>
+      <div class="csub">Side-by-side KPI comparison across your 3 candidates — normalized to 0–100 scale so all KPIs are comparable</div>
       <canvas id="groupedBar1" height="280"></canvas>
-      <div class="chart-tip">📐 Power BI: Clustered Bar Chart. Normalize each KPI to 0–100 scale (divide by max value × 100) so all metrics are comparable on one chart. Group by player, one bar per KPI.</div>
+      <div class="chart-tip">💡 One approach: a grouped bar chart from your SelectedPlayers table comparing all 3 players side-by-side across each KPI. Normalizing each KPI to a 0–100 scale (divide by the max, multiply by 100) helps when your KPIs use different units — but if they're already comparable, you can skip the normalization.</div>
+      <div class="dax-tip"><strong>DAX hint for normalized KPI:</strong> <code>ValueScore_Normalized = DIVIDE([YourKPI], MAXX(ALL(SelectedPlayers), SelectedPlayers[your_kpi_column])) * 100</code></div>
     </div>
     <div class="chart-card">
-      <div class="ctitle finding">Eason's Bang for Buck is 1.6x the next best — and 1.8x league average</div>
-      <div class="csub">Win Shares per $10M — the Aberdeen Angels' GMs deciding metric</div>
+      <div class="ctitle finding">Top candidate's value-per-dollar score is nearly 2x the qualifying average</div>
+      <div class="csub">Your primary "best deal" KPI — compared across candidates and vs. qualifying pool average</div>
       <canvas id="bar2" height="280"></canvas>
-      <div class="chart-tip">📐 Power BI: Horizontal Bar Chart, sorted descending by win_shares_per_10m. Add a reference line at the league average (2.3).</div>
+      <div class="chart-tip">💡 One approach: a horizontal bar chart from your SelectedPlayers table, sorted by your primary KPI. Adding a reference line at the qualifying pool average gives the GM immediate context for whether each candidate is above or below the bar. How you visualize this is up to you — the key is that the comparison is clear at a glance.</div>
+      <div class="dax-tip"><strong>DAX hint for reference line:</strong> <code>QualifyingAvgKPI = CALCULATE(AVERAGE(Players[your_kpi_column]), Players[salary_millions]&lt;30, Players[contract_year_number]&gt;=3, Players[contract_year_number]&lt;=5, Players[games_played]&gt;=40)</code></div>
     </div>
   </div>
 
-  <div class="chart-card full">
-    <div class="ctitle finding">All 3 candidates meet the GMs' criteria — Eason wins on efficiency, Murray on win volume</div>
-    <div class="csub">Full stat breakdown for Kavir Naik &amp; David Wise's final 3 candidates</div>
+  <div class="chart-card full" style="margin-bottom:16px;">
+    <div class="ctitle finding">All 3 candidates qualify — your top pick wins on value, second candidate wins on total wins contributed</div>
+    <div class="csub">Full KPI breakdown for your final 3 candidates — fill in with your actual player names and calculated stats</div>
     <table class="compare-table">
-      <thead><tr><th>Rank</th><th>Player</th><th>Team</th><th>Pos</th><th>PPG</th><th>Win Shares</th><th>Salary ($M)</th><th>Bang for Buck ⭐</th><th>Games Played</th><th>Career Year</th></tr></thead>
+      <thead><tr><th>Rank</th><th>Player</th><th>Team</th><th>Pos</th><th>Your KPI 1</th><th>Your KPI 2</th><th>Your KPI 3</th><th>Salary ($M)</th><th>Games Played</th><th>Career Year</th></tr></thead>
       <tbody>
         <tr>
           <td><span class="rank-badge r1">1</span></td>
-          <td style="font-weight:700;color:var(--navy)">Tari Eason</td>
-          <td>HOU</td><td>PF</td><td>4.2</td><td>2.7</td>
-          <td class="top">$6.57M</td><td class="top">4.11</td><td>79</td><td>Year 3</td>
+          <td style="font-weight:700;color:var(--navy)">Your #1 Pick</td>
+          <td>XXX</td><td>XX</td>
+          <td class="top">[highest KPI 1]</td><td>[KPI 2]</td><td>[KPI 3]</td>
+          <td class="top">$X.XM</td><td>XX</td><td>Year X</td>
         </tr>
         <tr>
           <td><span class="rank-badge">2</span></td>
-          <td style="font-weight:700">Keegan Murray</td>
-          <td>SAC</td><td>SF</td><td>12.1</td><td>3.3</td>
-          <td>$12.9M</td><td>2.56</td><td>62</td><td>Year 5</td>
+          <td style="font-weight:700">Your #2 Pick</td>
+          <td>XXX</td><td>XX</td>
+          <td>[KPI 1]</td><td>[KPI 2]</td><td>[KPI 3]</td>
+          <td>$X.XM</td><td>XX</td><td>Year X</td>
         </tr>
         <tr>
           <td><span class="rank-badge">3</span></td>
-          <td style="font-weight:700">Josh Giddey</td>
-          <td>CHI</td><td>PG</td><td>2.5</td><td>2.3</td>
-          <td>$10.97M</td><td>2.10</td><td>63</td><td>Year 5</td>
+          <td style="font-weight:700">Your #3 Pick</td>
+          <td>XXX</td><td>XX</td>
+          <td>[KPI 1]</td><td>[KPI 2]</td><td>[KPI 3]</td>
+          <td>$X.XM</td><td>XX</td><td>Year X</td>
         </tr>
       </tbody>
     </table>
-    <div class="chart-tip" style="margin-top:10px;">📐 Power BI: Table visual. Use conditional formatting on Bang for Buck — green top, yellow middle, red below avg. Flag players meeting all 3 GM criteria with a ✓ column.</div>
+    <div class="chart-tip" style="margin-top:10px;">💡 One approach: a simple table from your SelectedPlayers table with conditional formatting on your primary KPI. Adding a column that confirms whether each player meets all 3 GM criteria makes it easy for the GM to validate your picks without digging into the data themselves.</div>
+    <div class="dax-tip"><strong>DAX hint for ✓ column:</strong> <code>MeetsCriteria = IF(AND(AND(SelectedPlayers[salary_millions]&lt;30, SelectedPlayers[contract_year_number]&gt;=3), AND(SelectedPlayers[contract_year_number]&lt;=5, SelectedPlayers[games_played]&gt;=40)), "✓", "✗")</code></div>
   </div>
-</div>
 
-<!-- ═══ TAB 3 ═══ -->
-<div id="t3" class="tab-content">
-  <div class="needs-grid">
-    <div class="need-card">
-      <h3>Aberdeen Angels — Win Share by Position</h3>
-      <p style="font-size:12px;color:var(--gray);margin-bottom:14px;">Avg Win Shares per position — where is the team strong vs. where do Kavir Naik &amp; David Wise need to invest?</p>
-      <div class="pos-row">
-        <div class="pos-label">PG</div>
-        <div class="bar-bg"><div class="bar-fill" style="width:72%;background:var(--green)"></div></div>
-        <div class="pos-val" style="color:var(--green)">5.1</div>
-      </div>
-      <div class="pos-row">
-        <div class="pos-label">SG</div>
-        <div class="bar-bg"><div class="bar-fill" style="width:28%;background:var(--red)"></div></div>
-        <div class="pos-val" style="color:var(--red)">2.0</div>
-      </div>
-      <div class="pos-row">
-        <div class="pos-label">SF</div>
-        <div class="bar-bg"><div class="bar-fill" style="width:50%;background:var(--navy)"></div></div>
-        <div class="pos-val" style="color:var(--navy)">3.6</div>
-      </div>
-      <div class="pos-row">
-        <div class="pos-label">PF</div>
-        <div class="bar-bg"><div class="bar-fill" style="width:35%;background:var(--red)"></div></div>
-        <div class="pos-val" style="color:var(--red)">2.5</div>
-      </div>
-      <div class="pos-row">
-        <div class="pos-label">C</div>
-        <div class="bar-bg"><div class="bar-fill" style="width:78%;background:var(--green)"></div></div>
-        <div class="pos-val" style="color:var(--green)">5.5</div>
-      </div>
-      <div style="margin-top:14px;padding:9px 12px;background:#FFF0F0;border-radius:6px;font-size:13px;color:var(--red);font-weight:600;">
-        ⚠ Power Forward (PF) and Shooting Guard (SG) are well below team average
-      </div>
-      <div class="chart-tip">📐 Power BI: Bar Chart. Conditional formatting — red for positions below 3.0 WS threshold.</div>
-    </div>
-
-    <div class="need-card">
-      <h3>Aberdeen Angels vs. League Average by Position</h3>
-      <canvas id="groupedBar2" height="240"></canvas>
-      <div class="chart-tip">📐 Power BI: Clustered Bar Chart. Two series: "Aberdeen Angels" and "League Avg". Group by position. Easier than a radar chart to read exact gap size.</div>
-    </div>
-
-    <div class="need-card" style="grid-column:1/-1">
-      <h3>Which Eligible Players Fill the PF Gap for Aberdeen Angels?</h3>
-      <canvas id="bar3" height="180"></canvas>
-      <div class="chart-tip">📐 Power BI: Horizontal Bar Chart filtered to PF only, sorted by win_shares_per_10m. Answers "who's the best eligible PF deal?" in one glance.</div>
-    </div>
-
-    <div class="insight-box" style="grid-column:1/-1">
-      <h3>So What Does This Tell GMs Kavir Naik &amp; David Wise?</h3>
-      <p>The Aberdeen Angels are deep at center and point guard — no investment needed there. The critical gaps are power forward and shooting guard, both sitting well below team average on win contribution.</p>
-      <p>Among all eligible players matching the GMs' criteria, Tari Eason (HOU, PF) directly fills the primary gap at the highest efficiency in the qualifying pool — 4.11 wins per $10M, nearly 1.8x the qualifying average of 2.3.</p>
-      <div class="insight-rec">💡 Recommendation: Sign Tari Eason (PF, HOU, $6.57M/yr) — addresses the Aberdeen Angels' biggest positional gap at the best Bang for Buck in the entire eligible pool, with $23.4M budget remaining.</div>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -264,13 +224,11 @@ function showTab(id,btn){
 }
 
 const allPlayers = [
-  // High-salary zone
   {n:'Bradley Beal',t:'PHX',pos:'SG',sal:47.0,ws:1.2,gp:54,yr:7},
   {n:'Zach LaVine',t:'CHI',pos:'SG',sal:43.3,ws:2.1,gp:68,yr:8},
   {n:'Ben Simmons',t:'BKN',pos:'PG',sal:37.1,ws:0.8,gp:38,yr:7},
   {n:'Tobias Harris',t:'DET',pos:'PF',sal:39.3,ws:1.8,gp:72,yr:10},
   {n:'Karl-Anthony Towns',t:'NYK',pos:'C',sal:33.8,ws:4.2,gp:65,yr:9},
-  // Mid-range good value
   {n:'Tyrese Haliburton',t:'IND',pos:'PG',sal:22.3,ws:5.8,gp:61,yr:4},
   {n:'Scottie Barnes',t:'TOR',pos:'PF',sal:24.2,ws:5.1,gp:71,yr:4},
   {n:'Cade Cunningham',t:'DET',pos:'PG',sal:28.0,ws:4.8,gp:62,yr:4},
@@ -280,15 +238,14 @@ const allPlayers = [
   {n:'Jalen Williams',t:'OKC',pos:'SG',sal:18.7,ws:6.1,gp:74,yr:3},
   {n:'Darius Garland',t:'CLE',pos:'PG',sal:29.5,ws:3.8,gp:55,yr:5},
   {n:'Jabari Smith Jr.',t:'HOU',pos:'PF',sal:10.3,ws:2.6,gp:70,yr:3},
-  // Top 3 picks (consistent with CSV/gate rubric)
-  {n:'Tari Eason',t:'HOU',pos:'PF',sal:6.57,ws:2.7,gp:79,yr:3},
-  {n:'Keegan Murray',t:'SAC',pos:'SF',sal:12.9,ws:3.3,gp:62,yr:5},
-  {n:'Josh Giddey',t:'CHI',pos:'PG',sal:10.97,ws:2.3,gp:63,yr:5},
+  {n:'Player A (your pick)',t:'XXX',pos:'XX',sal:6.57,ws:2.7,gp:79,yr:3},
+  {n:'Player B (your pick)',t:'XXX',pos:'XX',sal:12.9,ws:3.3,gp:62,yr:5},
+  {n:'Player C (your pick)',t:'XXX',pos:'XX',sal:10.97,ws:2.3,gp:63,yr:5},
   {n:'Chet Holmgren',t:'OKC',pos:'C',sal:11.5,ws:4.1,gp:58,yr:2},
   {n:'Gradey Dick',t:'TOR',pos:'SG',sal:4.1,ws:1.8,gp:60,yr:2},
   {n:'OG Anunoby',t:'NYK',pos:'SF',sal:29.1,ws:3.9,gp:67,yr:7},
 ];
-const top3Names=['Tari Eason','Keegan Murray','Josh Giddey'];
+const top3Names=['Player A (your pick)','Player B (your pick)','Player C (your pick)'];
 
 function applyFilter(){
   const pos=document.getElementById('pos-filter').value;
@@ -310,78 +267,57 @@ function applyFilter(){
 
 let scatterChart;
 function buildScatter(players){
-  const others=players.filter(p=>!top3Names.includes(p.n));
-  const picks=players.filter(p=>top3Names.includes(p.n));
+  const qualifying=players.filter(p=>p.sal<30&&p.yr>=3&&p.yr<=5&&p.gp>=40);
+  const others=players.filter(p=>!(p.sal<30&&p.yr>=3&&p.yr<=5&&p.gp>=40));
   const cfg={type:'bubble',data:{datasets:[
-    {label:'Other Players',data:others.map(p=>({x:p.sal,y:p.ws,r:Math.max(4,p.gp/10),_name:p.n,_team:p.t})),
-     backgroundColor:'rgba(29,66,138,.22)',borderColor:'rgba(29,66,138,.45)',borderWidth:1},
-    {label:'Top 3 Candidates',data:picks.map(p=>({x:p.sal,y:p.ws,r:Math.max(6,p.gp/9),_name:p.n,_team:p.t})),
-     backgroundColor:'rgba(255,199,44,.8)',borderColor:GOLD,borderWidth:2},
+    {label:'All Other Players',data:others.map(p=>({x:p.sal,y:p.ws,r:Math.max(4,p.gp/10),_name:p.n,_team:p.t})),
+     backgroundColor:'rgba(29,66,138,.18)',borderColor:'rgba(29,66,138,.35)',borderWidth:1},
+    {label:'Meets GM Criteria',data:qualifying.map(p=>({x:p.sal,y:p.ws,r:Math.max(5,p.gp/9),_name:p.n,_team:p.t})),
+     backgroundColor:'rgba(255,199,44,.75)',borderColor:GOLD,borderWidth:2},
   ]},options:{responsive:true,
     plugins:{legend:{position:'bottom'},
       tooltip:{callbacks:{label:d=>{const p=d.raw;return `${p._name} (${p._team}) — $${p.x}M · WS: ${p.y}`;}}}},
     scales:{x:{title:{display:true,text:'Salary ($M)'},min:0,max:55},
-            y:{title:{display:true,text:'Win Shares'},min:0,max:8}}}};
+            y:{title:{display:true,text:'Win Contribution (Win Shares)'},min:0,max:8}}}};
   if(scatterChart)scatterChart.destroy();
   scatterChart=new Chart(document.getElementById('scatter1'),cfg);
 }
 function updateScatter(players){
-  const others=players.filter(p=>!top3Names.includes(p.n));
-  const picks=players.filter(p=>top3Names.includes(p.n));
+  const qualifying=players.filter(p=>p.sal<30&&p.yr>=3&&p.yr<=5&&p.gp>=40);
+  const others=players.filter(p=>!(p.sal<30&&p.yr>=3&&p.yr<=5&&p.gp>=40));
   scatterChart.data.datasets[0].data=others.map(p=>({x:p.sal,y:p.ws,r:Math.max(4,p.gp/10),_name:p.n,_team:p.t}));
-  scatterChart.data.datasets[1].data=picks.map(p=>({x:p.sal,y:p.ws,r:Math.max(6,p.gp/9),_name:p.n,_team:p.t}));
+  scatterChart.data.datasets[1].data=qualifying.map(p=>({x:p.sal,y:p.ws,r:Math.max(5,p.gp/9),_name:p.n,_team:p.t}));
   scatterChart.update();
 }
 buildScatter(allPlayers);
 
-// BAR: BFB by salary tier
+// BAR: Value per dollar by salary tier (Tab 1)
 new Chart(document.getElementById('bar1'),{type:'bar',
   data:{labels:['Under $10M','$10–15M','$15–20M','$20–25M','$25–30M','Over $30M'],
-    datasets:[{label:'Avg WS per $10M',data:[4.5,2.8,2.1,1.7,1.2,0.7],backgroundColor:[GOLD,GOLD,NAVY,NAVY,GRAY,RED]}]},
+    datasets:[{label:'Avg Value per Dollar (KPI)',data:[4.5,2.8,2.1,1.7,1.2,0.7],backgroundColor:[GOLD,GOLD,NAVY,NAVY,GRAY,RED]}]},
   options:{responsive:true,plugins:{legend:{display:false}},
-    scales:{y:{beginAtZero:true,title:{display:true,text:'WS per $10M'}}}}});
+    scales:{y:{beginAtZero:true,title:{display:true,text:'Avg Value per Dollar KPI'}}}}});
 
-// GROUPED BAR: KPI comparison (Tab 2) — normalized 0-100
-// Eason: BFB=4.11→100, WS=2.7→82, Avail=79/82=96→96, SalVal=(30-6.57)/30→78
-// Murray: BFB=2.56→62, WS=3.3→100, Avail=62/82=76→76, SalVal=(30-12.9)/30→57
-// Giddey: BFB=2.10→51, WS=2.3→70, Avail=63/82=77→77, SalVal=(30-10.97)/30→63
+// GROUPED BAR: KPI comparison — Tab 2 (normalized 0–100, example data)
+// Your 3 picks — normalized scores across 3 KPIs
 new Chart(document.getElementById('groupedBar1'),{type:'bar',
-  data:{labels:['Bang for Buck','Win Shares','Availability %','Salary Value'],
+  data:{labels:['Value per Dollar','Win Contribution','Availability Rate'],
     datasets:[
-      {label:'Tari Eason (HOU)',data:[100,82,96,78],backgroundColor:'rgba(255,199,44,.8)',borderColor:GOLD,borderWidth:1},
-      {label:'Keegan Murray (SAC)',data:[62,100,76,57],backgroundColor:'rgba(29,66,138,.7)',borderColor:NAVY,borderWidth:1},
-      {label:'Josh Giddey (CHI)',data:[51,70,77,63],backgroundColor:'rgba(200,16,46,.6)',borderColor:RED,borderWidth:1},
+      {label:'Your #1 Pick',data:[100,82,96],backgroundColor:'rgba(255,199,44,.8)',borderColor:GOLD,borderWidth:1},
+      {label:'Your #2 Pick',data:[62,100,76],backgroundColor:'rgba(29,66,138,.7)',borderColor:NAVY,borderWidth:1},
+      {label:'Your #3 Pick',data:[51,70,77],backgroundColor:'rgba(200,16,46,.6)',borderColor:RED,borderWidth:1},
     ]},
   options:{responsive:true,plugins:{legend:{position:'bottom'},
     tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.raw}/100`}}},
-    scales:{x:{ticks:{font:{size:11}}},y:{min:0,max:100,title:{display:true,text:'Score (0–100)'}}}}});
+    scales:{x:{ticks:{font:{size:11}}},y:{min:0,max:100,title:{display:true,text:'Score (0–100 normalized)'}}}}});
 
-// HORIZONTAL BAR: Bang for Buck (Tab 2) — matches CSV stats
+// HORIZONTAL BAR: Primary KPI — Tab 2
 new Chart(document.getElementById('bar2'),{type:'bar',
-  data:{labels:['Tari Eason (HOU)','Keegan Murray (SAC)','Josh Giddey (CHI)','League Avg (qualifying)'],
-    datasets:[{label:'Win Shares per $10M',data:[4.11,2.56,2.10,2.3],
+  data:{labels:['Your #1 Pick','Your #2 Pick','Your #3 Pick','Qualifying Avg'],
+    datasets:[{label:'Value per Dollar KPI',data:[4.11,2.56,2.10,2.3],
       backgroundColor:[GOLD,NAVY,NAVY,GRAY],borderColor:[GOLD,NAVY,NAVY,GRAY],borderWidth:1}]},
   options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false}},
-    scales:{x:{beginAtZero:true,title:{display:true,text:'WS per $10M'}}}}});
-
-// GROUPED BAR: Team vs League (Tab 3)
-new Chart(document.getElementById('groupedBar2'),{type:'bar',
-  data:{labels:['PG','SG','SF','PF','C'],
-    datasets:[
-      {label:'Aberdeen Angels',data:[5.1,2.0,3.6,2.5,5.5],backgroundColor:'rgba(29,66,138,.75)',borderColor:NAVY,borderWidth:1},
-      {label:'League Avg',data:[3.8,3.9,3.7,3.7,3.9],backgroundColor:'rgba(200,16,46,.5)',borderColor:RED,borderWidth:1},
-    ]},
-  options:{responsive:true,plugins:{legend:{position:'bottom'},
-    tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.raw} WS`}}},
-    scales:{y:{beginAtZero:true,max:7,title:{display:true,text:'Win Shares'}}}}});
-
-// BAR: Eligible PF Bang for Buck (Tab 3)
-new Chart(document.getElementById('bar3'),{type:'bar',
-  data:{labels:['Tari Eason (HOU)','Jabari Smith Jr. (HOU)','Scottie Barnes (TOR)','OG Anunoby (NYK)','Evan Mobley (CLE)'],
-    datasets:[{label:'Bang for Buck (WS per $10M)',data:[4.11,2.52,2.11,1.84,3.20],
-      backgroundColor:[GOLD,NAVY,NAVY,NAVY,NAVY],borderColor:[GOLD,NAVY,NAVY,NAVY,NAVY],borderWidth:1}]},
-  options:{responsive:true,plugins:{legend:{display:false}},
-    scales:{y:{beginAtZero:true,title:{display:true,text:'WS per $10M'}}}}});
+    scales:{x:{beginAtZero:true,title:{display:true,text:'Your Primary KPI Score'}}}}});
 </script>
 </body>
 </html>

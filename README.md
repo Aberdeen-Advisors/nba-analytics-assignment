@@ -1,6 +1,8 @@
 # NBA Analytics Challenge
 ### Aberdeen Advisors Intern Program — Aberdeen Angels Scenario
 
+![Aberdeen Angels Team](assets/team.png)
+
 You're an analytics consultant hired by the **Aberdeen Angels**, a fictional NBA team on the edge of title contention. The General Managers have $30 million to spend and need one more player before the trade deadline. Your job: dig through real player data, build a dashboard, and deliver a data-backed recommendation they can act on.
 
 ---

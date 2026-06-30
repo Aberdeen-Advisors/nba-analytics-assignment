@@ -29,6 +29,7 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
       - name: Validate issue
+        id: validate
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -36,3 +37,24 @@ jobs:
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_BODY: ${{ github.event.issue.body }}
         run: python .github/scripts/validate_issue.py
+
+      - name: Email coordinator
+        if: steps.validate.outputs.action == 'escalate'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: prath@aberdeenadv.com
+          password: ${{ secrets.SMTP_PASSWORD }}
+          to: prath@aberdeenadv.com
+          from: NBA Analytics Bot <prath@aberdeenadv.com>
+          subject: "Intern submission question — Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}"
+          body: |
+            An intern has a submission question that needs your response.
+
+            Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}
+
+            ${{ github.event.issue.body }}
+
+            Reply on GitHub: ${{ github.event.issue.html_url }}

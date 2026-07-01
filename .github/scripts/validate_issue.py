@@ -184,6 +184,8 @@ for block in response.content:
 
     elif block.name == "create_fix_pr":
         branch = block.input["branch_name"]
+        repo = os.environ.get("GITHUB_REPOSITORY", "")
+
         subprocess.run(["git", "checkout", "-b", branch], check=True)
 
         for file in block.input["files"]:
@@ -198,18 +200,15 @@ for block in response.content:
         )
         subprocess.run(["git", "push", "--force", "origin", branch], check=True)
 
-        pr_body = (
+        pr_url = f"https://github.com/{repo}/compare/main...{branch}?expand=1"
+        comment = (
+            f"## Fix Ready for Review\n\n"
             f"{block.input['pr_body']}\n\n"
-            f"Fixes #{issue_number}\n\n"
-            f"*This PR was created automatically by Claude. Please review before merging.*"
+            f"The fix has been pushed to branch `{branch}`. "
+            f"**[Click here to open a pull request]({pr_url})** — review the changes and merge when ready.\n\n"
+            f"*Branch created automatically by Claude.*"
         )
-        subprocess.run([
-            "gh", "pr", "create",
-            "--title", block.input["pr_title"],
-            "--body", pr_body,
-            "--base", "main",
-            "--head", branch
-        ], check=True)
+        subprocess.run(["gh", "issue", "comment", str(issue_number), "--body", comment], check=True)
 
     elif block.name == "close_as_invalid":
         comment = (

@@ -196,7 +196,7 @@ for block in response.content:
             ["git", "commit", "-m", f"fix: {block.input['pr_title']}\n\nFixes #{issue_number}"],
             check=True
         )
-        subprocess.run(["git", "push", "origin", branch], check=True)
+        subprocess.run(["git", "push", "--force", "origin", branch], check=True)
 
         pr_body = (
             f"{block.input['pr_body']}\n\n"

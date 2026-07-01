@@ -3,6 +3,17 @@ name: Issue Validator
 on:
   issues:
     types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Issue number to re-validate
+        required: true
+      issue_title:
+        description: Issue title
+        required: true
+      issue_body:
+        description: Issue body
+        required: false
 
 jobs:
   validate:
@@ -33,9 +44,9 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GH_TOKEN: ${{ secrets.GH_PAT }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
-          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue_number }}
+          ISSUE_TITLE: ${{ github.event.issue.title || inputs.issue_title }}
+          ISSUE_BODY: ${{ github.event.issue.body || inputs.issue_body }}
         run: python .github/scripts/validate_issue.py
 
       - name: Email coordinator
